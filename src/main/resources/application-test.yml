@@ -1,0 +1,39 @@
+# ╔══════════════════════════════════════════════╗
+# ║  TripSi API — Test Profile                  ║
+# ║  Testcontainers PostgreSQL + minimal logging ║
+# ╚══════════════════════════════════════════════╝
+
+spring:
+  datasource:
+    # Testcontainers provides the connection URL dynamically
+    url: jdbc:tc:postgresql:16:///tripsi_test
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+
+  jpa:
+    show-sql: false
+
+  # Spring AI — mock in tests
+  ai:
+    openai:
+      api-key: sk-mock-test-key
+
+  flyway:
+    enabled: true
+
+# ── Logging ──
+logging:
+  level:
+    root: WARN
+    com.tripsi.api: INFO
+    org.testcontainers: INFO
+
+# ── Swagger UI disabled in test ──
+springdoc:
+  swagger-ui:
+    enabled: false
+
+# ── Test JWT ──
+tripsi:
+  jwt:
+    secret: test-secret-key-that-is-at-least-256-bits-long-for-hmac-sha
+    expiration-ms: 3600000

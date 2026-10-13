@@ -1,0 +1,47 @@
+# Build output 
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# IDE 
+.idea/
+*.iws
+*.iml
+*.ipr
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+bin/
+
+# Environment & secrets 
+.env
+*.pem
+*.key
+
+# OS 
+.DS_Store
+Thumbs.db
+
+# Logs 
+*.log
+logs/
+
+#  Maven 
+.mvn/timing.properties
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+
+# Docker 
+docker-compose.override.yml
+
+# extras
+docs
+CLAUDE.md
