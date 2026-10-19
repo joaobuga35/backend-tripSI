@@ -42,6 +42,6 @@ release.properties
 # Docker 
 docker-compose.override.yml
 
-# extras
-docs
-CLAUDE.md
+
+# Local 
+scripts/

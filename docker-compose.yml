@@ -1,7 +1,6 @@
-# ╔═══════════════════════════════════════════════════╗
-# ║  TripSi — Local Development Infrastructure       ║
-# ║  Usage: docker compose up -d                     ║
-# ╚═══════════════════════════════════════════════════╝
+# TripSi — Local Development Infrastructure     
+#  Usage: docker compose up -d                     
+
 
 services:
   postgres:
