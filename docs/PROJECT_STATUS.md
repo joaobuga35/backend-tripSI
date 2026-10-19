@@ -44,6 +44,10 @@
 ### User Module — domain data layer (SPRINT_PLAN #7, branch `feature/project-setup`)
 - [x] `V2__create_users_table.sql` — `users` table + `user_roles` join table (for `Set<Role>` element collection). Verified with `mvn flyway:migrate` against the local `tripsi-postgres` Docker container (schema now at v2)
 - [x] `Role`, `Status` enums + `User` entity (`user/domain/`) — TDD (4/4 tests, Red→Green). Pure domain, no Spring Security dependency: exposes `getRoles(): Set<Role>` instead of the diagram's original `getAuthorities()`. See `CLASS_DIAGRAM.md` note on `UserPrincipal` (adapter, still pending in SPRINT_PLAN #9/#10) for the `UserDetails` translation
+- [x] `UserRepository` (`user/port/out/`) — `JpaRepository<User, UUID>` + `findByEmail`, `existsByEmail`. No unit test written (nothing to unit-test in an interface Spring Data implements); verified by integration test in SPRINT_PLAN #16
+- [x] Minimal User DTOs (Java Records, `user/dto/`): `RegisterRequestDTO`, `UpdateUserDTO`, `UserResponseDTO`, `LoginRequestDTO` — created ahead of SPRINT_PLAN #11 only because `UserServicePort`/`UserService` (#10) need the types to compile. `UserMapper` (MapStruct) still pending — #11 now means "formalize the mapper", not "create the DTOs"
+- [x] `UserServicePort` (`user/port/in/`) + `UserService` (`user/application/`) — TDD (10/10 tests, Red→Green): register (with duplicate-email business rule), findById, findByEmail, update, softDelete
+- [x] `UserMapper` (MapStruct, `user/dto/`) — `User → UserResponseDTO`. `UserService` refactored to use it (manual mapping method removed); 10/10 tests still green
 
 ---
 
@@ -52,9 +56,6 @@
 > Order below follows `docs/SPRINT_PLAN.md` task numbering exactly (not reshuffled) per explicit instruction.
 
 ### Sprint 1 — remaining tasks (branch: `feature/project-setup` until Sprint 1 ends)
-- [ ] **#9** `UserRepository` (secondary port)
-- [ ] **#10** `UserService` with TDD — registration, update, soft delete
-- [ ] **#11** User DTOs (Java Records) + `UserMapper` (MapStruct)
 - [ ] **#12** JWT — `JwtTokenProvider`, `JwtAuthenticationFilter`
 - [ ] **#13** `SecurityConfig` — JWT filter chain, endpoint security, CORS. Also needs new (not in original SPRINT_PLAN numbering): `UserPrincipal` + `UserDetailsServiceImpl` in `user/adapter/in/security/` (see `CLASS_DIAGRAM.md`)
 - [ ] **#14** `AuthController` — POST `/api/v1/auth/login`, POST `/api/v1/auth/register`
