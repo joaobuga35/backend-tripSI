@@ -38,6 +38,8 @@
 - [x] Unit tests for `GlobalExceptionHandler` (5/5 passing) — `@Valid` validation branch deliberately deferred to the AuthController MockMvc tests (SPRINT_PLAN #17), where it can be tested through real Spring validation instead of hand-built `MethodArgumentNotValidException`
 - [x] `CorrelationIdFilter` (`shared/logging/`) — `OncePerRequestFilter` reusing/generating `X-Correlation-Id`, stored in MDC key `correlationId` (matches `logback-spring.xml`), echoed in the response header, cleared in `finally`
 - [x] Unit tests for `CorrelationIdFilter` (3/3 passing)
+- [x] `OpenApiConfig` (`shared/config/`) — Swagger metadata + global `bearerAuth` (HTTP Bearer, JWT) security scheme
+- [x] Unit tests for `OpenApiConfig` (2/2 passing)
 
 ---
 
@@ -46,8 +48,6 @@
 > Order below follows `docs/SPRINT_PLAN.md` task numbering exactly (not reshuffled) per explicit instruction.
 
 ### Sprint 1 — remaining tasks (branch: `feature/project-setup` until Sprint 1 ends)
-- [ ] **#5** `CorrelationIdFilter` — MDC propagation (`shared/logging/`)
-- [ ] **#6** Springdoc OpenAPI config — `SwaggerConfig`, global Bearer JWT scheme (`shared/config/`)
 - [ ] **#7** `V2__create_users_table.sql` (V1 already used for uuid-ossp extension)
 - [ ] **#8** User entity, Role enum, Status enum (TDD — domain behavior tested first)
 - [ ] **#9** `UserRepository` (secondary port)
