@@ -53,6 +53,15 @@
 - [x] `JwtTokenProvider` (`shared/security/`) — TDD (4/4 tests). Deliberately generic: takes `(UUID userId, String email, Set<String> roles)`, never touches `User`/`UserPrincipal` — keeps `shared` free of any module dependency (Spring Modulith rule: feature modules depend on `shared`, never the reverse)
 - [x] `JwtAuthenticationFilter` (`shared/security/`) — reads `Authorization: Bearer`, populates `SecurityContextHolder` directly from JWT claims (no DB lookup per request — stateless). 4/4 tests passing
 
+### SecurityConfig (SPRINT_PLAN #13, branch `feature/project-setup`)
+- [x] `UserPrincipal` (`user/adapter/in/security/`) — implements `UserDetails`, wraps `User`, translates `Set<Role>` → `Collection<GrantedAuthority>`. 4/4 tests
+- [x] `UserDetailsServiceImpl` (`user/adapter/in/security/`) — implements Spring Security's `UserDetailsService`; used only by the login `AuthenticationManager`/`DaoAuthenticationProvider` to verify passwords, NOT by the per-request JWT filter. 2/2 tests
+- [x] `RestAuthenticationEntryPoint` / `RestAccessDeniedHandler` (`shared/security/`) — Spring Security rejects unauthenticated/forbidden requests *before* they reach `GlobalExceptionHandler` (it only catches exceptions thrown inside the `DispatcherServlet`/controller layer), so without these two the 401/403 bodies would not be RFC 9457 `ProblemDetail` like every other error in the API. Both just write a `ProblemDetail` JSON body directly to the response
+- [x] `SecurityConfig` (`shared/config/`) — stateless JWT filter chain (`SessionCreationPolicy.STATELESS`), CSRF disabled (justified: stateless bearer-token API, not cookie/session-based, so CSRF doesn't apply — standard OWASP guidance), CORS from `tripsi.cors.allowed-origins`, `/api/v1/auth/**` + Swagger/OpenAPI paths public, everything else requires auth. `BCryptPasswordEncoder` bean lives here (consumed by `UserService`, built back in #10/SPRINT_PLAN numbering)
+- **Two subtle fixes applied while wiring this** (documented because they're easy to reintroduce by accident):
+  1. `JwtAuthenticationFilter` deliberately has **no** `@Component`. It's manually `new`'d inside `SecurityConfig` and added via `addFilterBefore`. If it were a `@Component`, Spring Boot's generic servlet-filter auto-registration would *also* register it outside Spring Security's control — at an unpredictable position, risking the `SecurityContext` it sets being wiped by Security's own context-reset filter. (Documented pattern — see Spring Security's own sample apps and the well-known Baeldung JWT tutorial, which never annotate a manually-wired filter with `@Component`.)
+  2. `CorrelationIdFilter` got `@Order(Ordered.HIGHEST_PRECEDENCE)`. Generic `@Component` filters are registered by Spring Boot at default/lowest precedence, which would put it *after* Spring Security's filter chain — meaning logs produced during JWT authentication wouldn't carry a `correlationId`. Now it always runs first.
+
 ---
 
 ## What Needs To Be Done Next
@@ -60,7 +69,6 @@
 > Order below follows `docs/SPRINT_PLAN.md` task numbering exactly (not reshuffled) per explicit instruction.
 
 ### Sprint 1 — remaining tasks (branch: `feature/project-setup` until Sprint 1 ends)
-- [ ] **#13** `SecurityConfig` — JWT filter chain, endpoint security, CORS. Also needs new (not in original SPRINT_PLAN numbering): `UserPrincipal` + `UserDetailsServiceImpl` in `user/adapter/in/security/` (see `CLASS_DIAGRAM.md`) — needed for the login `AuthenticationManager` to verify passwords; the request-time `JwtAuthenticationFilter` above does NOT use these (it reads roles straight from the JWT claims)
 - [ ] **#14** `AuthController` — POST `/api/v1/auth/login`, POST `/api/v1/auth/register`
 - [ ] **#15** `UserController` — GET/PUT `/api/v1/users/me`
 - [ ] **#16** `UserRepository` integration tests (Testcontainers)

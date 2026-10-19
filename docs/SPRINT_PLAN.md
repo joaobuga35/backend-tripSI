@@ -196,7 +196,7 @@
 
 | Sprint | Planned SP | Completed SP | Notes |
 |--------|:---:|:---:|-------|
-| Sprint 1 | 32 | 25 | Tasks #1–12 done. Next: #13 (SecurityConfig) on `feature/project-setup` — needs UserPrincipal + UserDetailsServiceImpl (user/adapter/in/security/, added scope from #5) built alongside it for the AuthenticationManager |
+| Sprint 1 | 32 | 27 | Tasks #1–13 done — full JWT + SecurityConfig stack wired (UserPrincipal, UserDetailsServiceImpl, ProblemDetail-formatted 401/403, stateless filter chain). Next: #14 (AuthController) on `feature/project-setup` |
 | Sprint 2 | 26 | — | |
 | Sprint 3 | 36 | — | |
 | Sprint 4 | 42 | — | |

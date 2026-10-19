@@ -8,14 +8,16 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
 
 // Reads the Bearer token and, if valid, populates the SecurityContext for this request only (stateless).
-@Component
+// Not a @Component: it's wired manually into the Security filter chain by SecurityConfig
+// (addFilterBefore) — annotating it would make Spring Boot also auto-register it as a plain
+// servlet filter outside Security's chain, running at an unpredictable position and risking
+// its SecurityContext being wiped by Security's own context-reset filter.
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final String AUTHORIZATION_HEADER = "Authorization";
