@@ -196,7 +196,7 @@
 
 | Sprint | Planned SP | Completed SP | Notes |
 |--------|:---:|:---:|-------|
-| Sprint 1 | 32 | — | |
+| Sprint 1 | 32 | 9 | Tasks #1–4 done (project setup, config, docker, GlobalExceptionHandler). In progress: #5 (CorrelationIdFilter) on `feature/project-setup` |
 | Sprint 2 | 26 | — | |
 | Sprint 3 | 36 | — | |
 | Sprint 4 | 42 | — | |

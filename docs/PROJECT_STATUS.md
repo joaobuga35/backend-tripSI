@@ -36,6 +36,8 @@
 - [x] `GlobalExceptionHandler` (`shared/exception/`) — `@RestControllerAdvice` returning RFC 9457 `ProblemDetail` for `ResourceNotFoundException` (404), `BusinessRuleException` (422), `BadCredentialsException` (401), `AccessDeniedException` (403), bean validation errors (400, field-level), and a catch-all (500) that logs full detail server-side only
 - [x] `ResourceNotFoundException`, `BusinessRuleException` (`shared/exception/`)
 - [x] Unit tests for `GlobalExceptionHandler` (5/5 passing) — `@Valid` validation branch deliberately deferred to the AuthController MockMvc tests (SPRINT_PLAN #17), where it can be tested through real Spring validation instead of hand-built `MethodArgumentNotValidException`
+- [x] `CorrelationIdFilter` (`shared/logging/`) — `OncePerRequestFilter` reusing/generating `X-Correlation-Id`, stored in MDC key `correlationId` (matches `logback-spring.xml`), echoed in the response header, cleared in `finally`
+- [x] Unit tests for `CorrelationIdFilter` (3/3 passing)
 
 ---
 
