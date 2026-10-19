@@ -24,7 +24,16 @@ classDiagram
             +createNew(UserDTO) User
             +updateUser(UpdateUserDTO) void
             +softDelete() void
+            +getRoles() Set~Role~
+        }
+
+        class UserPrincipal {
+            <<adapter — adapter/in/security>>
+            -User user
             +getAuthorities() Collection
+            +getUsername() String
+            +getPassword() String
+            +isEnabled() boolean
         }
 
         class UserServicePort {
@@ -270,6 +279,7 @@ classDiagram
     User --> Role : has many
     User --> Status : has one
     UserServicePort <|.. User : operates on
+    UserPrincipal --> User : wraps (adapts to UserDetails)
 
     %% Suggestion module (internal JPA relationships)
     Prompt *-- Location : embeds
@@ -385,6 +395,14 @@ classDiagram
 │  - GET  /api/v1/users/me                 │
 │  - PUT  /api/v1/users/me                 │
 │  - DELETE /api/v1/users/me               │
+│                                           │
+│  UserDetailsServiceImpl (Spring Security)│
+│  - loadUserByUsername(String)            │
+│    → wraps User into UserPrincipal       │
+│    (adapter/in/security/) — invoked BY   │
+│    the Spring Security framework, same   │
+│    role as a controller: external        │
+│    stimulus calling into the module      │
 └───────────────────────────────────────────┘
 
 ┌─ Secondary Ports (out) ──────────────────┐
@@ -392,6 +410,8 @@ classDiagram
 │    extends JpaRepository<User, UUID>     │
 └───────────────────────────────────────────┘
 ```
+
+**Note**: `User` (domain) has no dependency on Spring Security — it exposes `getRoles(): Set<Role>` only. `UserPrincipal` (in `adapter/in/security/`) implements `UserDetails` and translates `Set<Role>` → `Collection<GrantedAuthority>`. This keeps the domain testable without the Spring Security classpath and keeps the auth strategy swappable without touching the domain (ADR-002).
 
 ### suggestion module
 ```

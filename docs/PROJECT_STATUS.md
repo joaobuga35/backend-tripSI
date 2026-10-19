@@ -41,6 +41,10 @@
 - [x] `OpenApiConfig` (`shared/config/`) — Swagger metadata + global `bearerAuth` (HTTP Bearer, JWT) security scheme
 - [x] Unit tests for `OpenApiConfig` (2/2 passing)
 
+### User Module — domain data layer (SPRINT_PLAN #7, branch `feature/project-setup`)
+- [x] `V2__create_users_table.sql` — `users` table + `user_roles` join table (for `Set<Role>` element collection). Verified with `mvn flyway:migrate` against the local `tripsi-postgres` Docker container (schema now at v2)
+- [x] `Role`, `Status` enums + `User` entity (`user/domain/`) — TDD (4/4 tests, Red→Green). Pure domain, no Spring Security dependency: exposes `getRoles(): Set<Role>` instead of the diagram's original `getAuthorities()`. See `CLASS_DIAGRAM.md` note on `UserPrincipal` (adapter, still pending in SPRINT_PLAN #9/#10) for the `UserDetails` translation
+
 ---
 
 ## What Needs To Be Done Next
@@ -48,13 +52,11 @@
 > Order below follows `docs/SPRINT_PLAN.md` task numbering exactly (not reshuffled) per explicit instruction.
 
 ### Sprint 1 — remaining tasks (branch: `feature/project-setup` until Sprint 1 ends)
-- [ ] **#7** `V2__create_users_table.sql` (V1 already used for uuid-ossp extension)
-- [ ] **#8** User entity, Role enum, Status enum (TDD — domain behavior tested first)
 - [ ] **#9** `UserRepository` (secondary port)
 - [ ] **#10** `UserService` with TDD — registration, update, soft delete
 - [ ] **#11** User DTOs (Java Records) + `UserMapper` (MapStruct)
 - [ ] **#12** JWT — `JwtTokenProvider`, `JwtAuthenticationFilter`
-- [ ] **#13** `SecurityConfig` — JWT filter chain, endpoint security, CORS
+- [ ] **#13** `SecurityConfig` — JWT filter chain, endpoint security, CORS. Also needs new (not in original SPRINT_PLAN numbering): `UserPrincipal` + `UserDetailsServiceImpl` in `user/adapter/in/security/` (see `CLASS_DIAGRAM.md`)
 - [ ] **#14** `AuthController` — POST `/api/v1/auth/login`, POST `/api/v1/auth/register`
 - [ ] **#15** `UserController` — GET/PUT `/api/v1/users/me`
 - [ ] **#16** `UserRepository` integration tests (Testcontainers)

@@ -141,6 +141,7 @@
 **Context**: Academic project, but security practices are part of the evaluation criteria and professional standard.
 **Decision**: Address all OWASP Top 10 categories from day 1 through architectural decisions, Spring Security configuration, and coding practices. Final security scan after API completion.
 **Consequences**: Security is baked in, not bolted on. Some items (rate limiting, account lockout) are stretch goals but the architecture supports them.
+**Note (A02 — Cryptographic Failures)**: `JWT_SECRET` must always be generated locally (e.g. `openssl rand -base64 64`), never via a third-party website — an online generator means the secret passes through a server you don't control, which could log or retain it even for a "just dev" value. This project's `JWT_SECRET` was generated locally for this reason.
 
 ### ADR-007: API Versioning with URI Prefix
 
@@ -199,7 +200,10 @@ com.tripsi.api/
 │   ├── port/
 │   │   ├── in/                                #   UserServicePort (primary port — driving interface)
 │   │   └── out/                               #   UserRepository (extends JpaRepository)
-│   ├── adapter/in/rest/                       #   UserController, AuthController → depend on UserServicePort
+│   ├── adapter/
+│   │   ├── in/rest/                           #   UserController, AuthController → depend on UserServicePort
+│   │   └── in/security/                       #   UserPrincipal (implements UserDetails, wraps User),
+│   │                                          #   UserDetailsServiceImpl (Spring Security UserDetailsService)
 │   └── dto/                                   #   RegisterRequestDTO, LoginRequestDTO, UserResponseDTO, UserMapper
 │
 ├── suggestion/                                # ── MODULE ──

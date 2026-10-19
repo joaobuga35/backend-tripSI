@@ -1,7 +1,6 @@
-# ╔══════════════════════════════════════════╗
-# ║  TripSi API — Development Profile       ║
-# ║  Local PostgreSQL + debug logging        ║
-# ╚══════════════════════════════════════════╝
+#
+#   TripSi API — Development Profile
+#   Local PostgreSQL + debug logging
 
 spring:
   datasource:
@@ -21,7 +20,7 @@ spring:
     openai:
       api-key: ${OPENAI_API_KEY:sk-mock-dev-key}
 
-# ── Logging ──
+#  Logging
 logging:
   level:
     root: INFO
@@ -30,7 +29,7 @@ logging:
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
 
-# ── Swagger UI enabled in dev ──
+# Swagger UI enabled in dev
 springdoc:
   swagger-ui:
     enabled: true

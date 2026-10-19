@@ -196,7 +196,7 @@
 
 | Sprint | Planned SP | Completed SP | Notes |
 |--------|:---:|:---:|-------|
-| Sprint 1 | 32 | 11 | Tasks #1–6 done (project setup, config, docker, GlobalExceptionHandler, CorrelationIdFilter, OpenApiConfig). Shared/cross-cutting work complete. Next: #7 (V2 users table migration) on `feature/project-setup` |
+| Sprint 1 | 32 | 14 | Tasks #1–8 done. `User`/`Role`/`Status` built TDD; `getAuthorities()` moved out of domain into a new `UserPrincipal` adapter (not in original task list, added to #13 scope) to keep `User` free of Spring Security deps. Next: #9 (UserRepository) on `feature/project-setup` |
 | Sprint 2 | 26 | — | |
 | Sprint 3 | 36 | — | |
 | Sprint 4 | 42 | — | |
