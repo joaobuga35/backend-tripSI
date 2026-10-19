@@ -196,7 +196,7 @@
 
 | Sprint | Planned SP | Completed SP | Notes |
 |--------|:---:|:---:|-------|
-| Sprint 1 | 32 | 22 | Tasks #1–11 done. Next: #12 (JWT — JwtTokenProvider, JwtAuthenticationFilter) on `feature/project-setup`. Also still owes: UserPrincipal + UserDetailsServiceImpl (user/adapter/in/security/, added scope from #5) |
+| Sprint 1 | 32 | 25 | Tasks #1–12 done. Next: #13 (SecurityConfig) on `feature/project-setup` — needs UserPrincipal + UserDetailsServiceImpl (user/adapter/in/security/, added scope from #5) built alongside it for the AuthenticationManager |
 | Sprint 2 | 26 | — | |
 | Sprint 3 | 36 | — | |
 | Sprint 4 | 42 | — | |

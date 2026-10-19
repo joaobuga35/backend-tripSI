@@ -49,6 +49,10 @@
 - [x] `UserServicePort` (`user/port/in/`) + `UserService` (`user/application/`) — TDD (10/10 tests, Red→Green): register (with duplicate-email business rule), findById, findByEmail, update, softDelete
 - [x] `UserMapper` (MapStruct, `user/dto/`) — `User → UserResponseDTO`. `UserService` refactored to use it (manual mapping method removed); 10/10 tests still green
 
+### Shared Security (SPRINT_PLAN #12, branch `feature/project-setup`)
+- [x] `JwtTokenProvider` (`shared/security/`) — TDD (4/4 tests). Deliberately generic: takes `(UUID userId, String email, Set<String> roles)`, never touches `User`/`UserPrincipal` — keeps `shared` free of any module dependency (Spring Modulith rule: feature modules depend on `shared`, never the reverse)
+- [x] `JwtAuthenticationFilter` (`shared/security/`) — reads `Authorization: Bearer`, populates `SecurityContextHolder` directly from JWT claims (no DB lookup per request — stateless). 4/4 tests passing
+
 ---
 
 ## What Needs To Be Done Next
@@ -56,8 +60,7 @@
 > Order below follows `docs/SPRINT_PLAN.md` task numbering exactly (not reshuffled) per explicit instruction.
 
 ### Sprint 1 — remaining tasks (branch: `feature/project-setup` until Sprint 1 ends)
-- [ ] **#12** JWT — `JwtTokenProvider`, `JwtAuthenticationFilter`
-- [ ] **#13** `SecurityConfig` — JWT filter chain, endpoint security, CORS. Also needs new (not in original SPRINT_PLAN numbering): `UserPrincipal` + `UserDetailsServiceImpl` in `user/adapter/in/security/` (see `CLASS_DIAGRAM.md`)
+- [ ] **#13** `SecurityConfig` — JWT filter chain, endpoint security, CORS. Also needs new (not in original SPRINT_PLAN numbering): `UserPrincipal` + `UserDetailsServiceImpl` in `user/adapter/in/security/` (see `CLASS_DIAGRAM.md`) — needed for the login `AuthenticationManager` to verify passwords; the request-time `JwtAuthenticationFilter` above does NOT use these (it reads roles straight from the JWT claims)
 - [ ] **#14** `AuthController` — POST `/api/v1/auth/login`, POST `/api/v1/auth/register`
 - [ ] **#15** `UserController` — GET/PUT `/api/v1/users/me`
 - [ ] **#16** `UserRepository` integration tests (Testcontainers)
