@@ -196,7 +196,7 @@
 
 | Sprint | Planned SP | Completed SP | Notes |
 |--------|:---:|:---:|-------|
-| Sprint 1 | 32 | 27 | Tasks #1–13 done — full JWT + SecurityConfig stack wired (UserPrincipal, UserDetailsServiceImpl, ProblemDetail-formatted 401/403, stateless filter chain). Next: #14 (AuthController) on `feature/project-setup` |
+| Sprint 1 | 32 | 29 | Tasks #1–14 done. New port not in original CLASS_DIAGRAM.md: AuthServicePort/AuthService (login is an auth concern, kept separate from UserServicePort's CRUD). Next: #15 (UserController) on `feature/project-setup` |
 | Sprint 2 | 26 | — | |
 | Sprint 3 | 36 | — | |
 | Sprint 4 | 42 | — | |

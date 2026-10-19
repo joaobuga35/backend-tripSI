@@ -44,6 +44,10 @@ public class JwtTokenProvider {
                 .compact();
     }
 
+    public long getExpirationSeconds() {
+        return expirationMs / 1000;
+    }
+
     public boolean isValid(String token) {
         try {
             parseClaims(token);

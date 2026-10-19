@@ -413,6 +413,8 @@ classDiagram
 
 **Note**: `User` (domain) has no dependency on Spring Security — it exposes `getRoles(): Set<Role>` only. `UserPrincipal` (in `adapter/in/security/`) implements `UserDetails` and translates `Set<Role>` → `Collection<GrantedAuthority>`. This keeps the domain testable without the Spring Security classpath and keeps the auth strategy swappable without touching the domain (ADR-002).
 
+**Note (login)**: this diagram's original `UserServicePort` has no login method — only CRUD. Login (authenticate via `AuthenticationManager` + issue a JWT) is a distinct `AuthServicePort` / `AuthService`, added during implementation. `AuthController` depends on both ports: `register` → `UserServicePort`, `login` → `AuthServicePort`.
+
 ### suggestion module
 ```
 ┌─ Primary Port (in) ──────────────────────┐

@@ -62,6 +62,12 @@
   1. `JwtAuthenticationFilter` deliberately has **no** `@Component`. It's manually `new`'d inside `SecurityConfig` and added via `addFilterBefore`. If it were a `@Component`, Spring Boot's generic servlet-filter auto-registration would *also* register it outside Spring Security's control — at an unpredictable position, risking the `SecurityContext` it sets being wiped by Security's own context-reset filter. (Documented pattern — see Spring Security's own sample apps and the well-known Baeldung JWT tutorial, which never annotate a manually-wired filter with `@Component`.)
   2. `CorrelationIdFilter` got `@Order(Ordered.HIGHEST_PRECEDENCE)`. Generic `@Component` filters are registered by Spring Boot at default/lowest precedence, which would put it *after* Spring Security's filter chain — meaning logs produced during JWT authentication wouldn't carry a `correlationId`. Now it always runs first.
 
+### AuthController (SPRINT_PLAN #14, branch `feature/project-setup`)
+- [x] `AuthResponseDTO` (`user/dto/`) — `accessToken`, `tokenType` ("Bearer"), `expiresIn` (seconds; RFC 6749 §5.1 shape). No `refreshToken` — out of scope until a real refresh-token flow is built (ADR-009 OAuth2 extension is a later stretch goal); adding the field without the mechanism behind it would be misleading
+- [x] `JwtTokenProvider.getExpirationSeconds()` added so `AuthService` can report `expiresIn` without duplicating the config value
+- [x] `AuthServicePort` (`user/port/in/`) + `AuthService` (`user/application/`) — TDD (2/2 tests). Deliberately separate from `UserServicePort`: login is an authentication concern (`AuthenticationManager` + JWT issuance), not user CRUD, and isn't in the original `CLASS_DIAGRAM.md` port list
+- [x] `AuthController` (`user/adapter/in/rest/`) — thin, delegates `register` to `UserServicePort` and `login` to `AuthServicePort`; Springdoc `@Operation`/`@ApiResponse` annotations present. `POST /api/v1/auth/register` (201), `POST /api/v1/auth/login` (200, 401 on bad credentials via existing `GlobalExceptionHandler`)
+
 ---
 
 ## What Needs To Be Done Next
@@ -69,7 +75,6 @@
 > Order below follows `docs/SPRINT_PLAN.md` task numbering exactly (not reshuffled) per explicit instruction.
 
 ### Sprint 1 — remaining tasks (branch: `feature/project-setup` until Sprint 1 ends)
-- [ ] **#14** `AuthController` — POST `/api/v1/auth/login`, POST `/api/v1/auth/register`
 - [ ] **#15** `UserController` — GET/PUT `/api/v1/users/me`
 - [ ] **#16** `UserRepository` integration tests (Testcontainers)
 - [ ] **#17** Auth controller tests (MockMvc) — also covers the `@Valid` validation branch deferred above

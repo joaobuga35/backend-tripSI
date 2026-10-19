@@ -36,6 +36,11 @@ class JwtTokenProviderTest {
     }
 
     @Test
+    void should_expose_configured_expiration_in_seconds() {
+        assertThat(jwtTokenProvider.getExpirationSeconds()).isEqualTo(3_600L);
+    }
+
+    @Test
     void should_return_false_when_token_is_tampered() {
         String token = jwtTokenProvider.generateToken(UUID.randomUUID(), "jane@tripsi.com", Set.of("ROLE_USER"));
         String tampered = token.substring(0, token.length() - 1) + (token.endsWith("a") ? "b" : "a");

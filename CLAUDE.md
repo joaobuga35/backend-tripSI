@@ -191,7 +191,8 @@ com.tripsi.api/
 ├── shared/                                    # Cross-cutting (NOT a Spring Modulith module)
 │   ├── config/                                #   SecurityConfig, CorsConfig, OpenApiConfig
 │   ├── exception/                             #   GlobalExceptionHandler, ResourceNotFoundException, BusinessRuleException
-│   ├── security/                              #   JwtTokenProvider, JwtAuthenticationFilter
+│   ├── security/                              #   JwtTokenProvider, JwtAuthenticationFilter,
+│   │                                          #   RestAuthenticationEntryPoint, RestAccessDeniedHandler
 │   └── logging/                               #   CorrelationIdFilter
 │
 ├── user/                                      # ── MODULE ──
