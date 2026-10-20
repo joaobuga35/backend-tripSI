@@ -72,6 +72,10 @@
 - [x] `JwtPrincipal(UUID userId, String email)` record (`shared/security/`) — replaces the raw email string as the `Authentication` principal set by `JwtAuthenticationFilter`, so controllers get the user's ID without an extra DB lookup. Still framework-generic, no `user` module dependency
 - [x] `UserController` (`user/adapter/in/rest/`) — `GET/PUT/DELETE /api/v1/users/me`, as originally sketched. Briefly switched to `/api/v1/users/{id}` + `@PreAuthorize` ownership check, then reverted: putting the id in the URL at all is an unneeded IDOR attack surface (OWASP A01) for no benefit, since the server already knows who's calling from the token — `/me` has no id for an attacker to tamper with. `@EnableMethodSecurity`/`@PreAuthorize` removed from `SecurityConfig` accordingly (unused). The `JwtPrincipal(UUID userId, String email)` change (see #13 above) was kept — it's what lets `/me` read the id straight off the token with no extra DB lookup
 
+### UserRepository integration tests (SPRINT_PLAN #16, branch `feature/project-setup`)
+- [x] Added `spring-boot-testcontainers` dependency to `pom.xml`. Fixed a scaffolding inconsistency found in `application-test.yml`: it used the legacy `jdbc:tc:postgresql:...` magic-URL driver, which needs the `org.testcontainers:jdbc` artifact — not present in `pom.xml`, so it would've failed the first time anyone actually ran a test needing the `test` profile with a real DB. Replaced with the current Spring Boot-recommended approach: `@ServiceConnection` on a `@Container`-managed `PostgreSQLContainer` declared directly in the test class — no manual datasource URL/driver config needed at all, so removed that from `application-test.yml`
+- [x] `UserRepositoryIntegrationTest` (`user/port/out/`, `@DataJpaTest` + `@Testcontainers`) — 6/6 tests: save/findById, findByEmail (hit/miss), existsByEmail (hit/miss), roles correctly persisted in the `user_roles` join table. Runs Flyway migrations (V1+V2) against a real disposable PostgreSQL container, not a stub
+
 ---
 
 ## What Needs To Be Done Next
@@ -79,8 +83,7 @@
 > Order below follows `docs/SPRINT_PLAN.md` task numbering exactly (not reshuffled) per explicit instruction.
 
 ### Sprint 1 — remaining tasks (branch: `feature/project-setup` until Sprint 1 ends)
-- [ ] **#16** `UserRepository` integration tests (Testcontainers)
-- [ ] **#17** Controller tests (MockMvc) for `AuthController` + `UserController` — also covers the `@Valid` validation branch deferred earlier
+- [ ] **#17** Controller tests (MockMvc) for `AuthController` + `UserController` — also covers the `@Valid` validation branch deferred earlier. This is the LAST Sprint 1 task
 
 ### Sprint 2 (Oct 20–26): Suggestion + Spring AI
 ### Sprint 3 (Oct 27–Nov 2): Flight + Duffel API

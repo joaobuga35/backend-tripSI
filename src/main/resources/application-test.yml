@@ -4,11 +4,8 @@
 # ╚══════════════════════════════════════════════╝
 
 spring:
-  datasource:
-    # Testcontainers provides the connection URL dynamically
-    url: jdbc:tc:postgresql:16:///tripsi_test
-    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
-
+  # Datasource is auto-configured by @ServiceConnection on the Testcontainers PostgreSQL
+  # container declared in each test class — no manual url/driver here.
   jpa:
     show-sql: false
 

@@ -1,3 +1,4 @@
+
 package com.tripsi.api.user.port.out;
 
 import com.tripsi.api.user.domain.User;
