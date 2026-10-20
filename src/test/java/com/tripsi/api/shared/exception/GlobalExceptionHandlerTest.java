@@ -7,6 +7,7 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
@@ -37,7 +38,17 @@ class GlobalExceptionHandlerTest {
 
     @Test
     void should_return_401_and_hide_detail_when_credentials_invalid() {
-        ProblemDetail problemDetail = handler.handleBadCredentials(new BadCredentialsException("secret internal detail"));
+        ProblemDetail problemDetail = handler.handleAuthenticationFailure(new BadCredentialsException("secret internal detail"));
+
+        assertThat(problemDetail.getStatus()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
+        assertThat(problemDetail.getDetail()).isEqualTo("Invalid credentials");
+    }
+
+    @Test
+    void should_return_401_with_same_generic_detail_when_account_is_disabled() {
+        // Same message as bad credentials on purpose — distinguishing the two would let an
+        // attacker enumerate which emails have an account (OWASP: no account-status leaks).
+        ProblemDetail problemDetail = handler.handleAuthenticationFailure(new DisabledException("account disabled"));
 
         assertThat(problemDetail.getStatus()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
         assertThat(problemDetail.getDetail()).isEqualTo("Invalid credentials");

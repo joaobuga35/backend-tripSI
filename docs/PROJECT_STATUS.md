@@ -1,7 +1,13 @@
 # TripSi — Project Status
 
-> **Last updated**: 2026-10-16 (Sprint 1, Day 2 — in progress on `feature/project-setup`)
+> **Last updated**: 2026-10-20 (Sprint 1 — COMPLETE, on `feature/project-setup`, not yet merged to `dev`)
 > **Current Sprint**: Sprint 1 (Oct 13–19) — Foundation + User + Auth
+
+---
+
+## Known Issues
+
+- **`ModularityTests` fails** — `NoSuchMethodError` on `ConfigDataEnvironmentPostProcessor.applyTo(...)`. Binary incompatibility between `spring-modulith` 2.1.1 and `spring-boot` 3.5.16; no stable Modulith release fixes it yet (only pre-release `2.2.0-M2`). Not a Sprint 1 blocker (formal module-boundary verification is SPRINT_PLAN #32, Sprint 2) — revisit then, check for a newer stable Modulith release first.
 
 ---
 
@@ -76,14 +82,26 @@
 - [x] Added `spring-boot-testcontainers` dependency to `pom.xml`. Fixed a scaffolding inconsistency found in `application-test.yml`: it used the legacy `jdbc:tc:postgresql:...` magic-URL driver, which needs the `org.testcontainers:jdbc` artifact — not present in `pom.xml`, so it would've failed the first time anyone actually ran a test needing the `test` profile with a real DB. Replaced with the current Spring Boot-recommended approach: `@ServiceConnection` on a `@Container`-managed `PostgreSQLContainer` declared directly in the test class — no manual datasource URL/driver config needed at all, so removed that from `application-test.yml`
 - [x] `UserRepositoryIntegrationTest` (`user/port/out/`, `@DataJpaTest` + `@Testcontainers`) — 6/6 tests: save/findById, findByEmail (hit/miss), existsByEmail (hit/miss), roles correctly persisted in the `user_roles` join table. Runs Flyway migrations (V1+V2) against a real disposable PostgreSQL container, not a stub
 
+### Controller tests + hardening pass (SPRINT_PLAN #17, branch `feature/project-setup`) — LAST Sprint 1 task
+- [x] **Bug found and fixed**: `GlobalExceptionHandler` only caught `BadCredentialsException`, not the broader `AuthenticationException`. A soft-deleted user attempting login (`UserPrincipal.isEnabled()=false`) throws `DisabledException` — a sibling type, not a subclass of `BadCredentialsException` — which would have fallen through to the generic 500 handler. Widened to `@ExceptionHandler(AuthenticationException.class)`, and **deliberately kept the same generic "Invalid credentials" detail for every cause** (bad password, disabled, locked, etc.) — revealing *why* auth failed would let an attacker enumerate which emails have an account (OWASP user-enumeration guidance)
+- [x] `AuthAndUserControllerIntegrationTest` (`user/adapter/in/rest/`, full `@SpringBootTest` + `@AutoConfigureMockMvc` + `@Testcontainers`) — 12/12 tests covering the real end-to-end stack (real Postgres, real Security filter chain, real JWT):
+  - register: 201 + no password in response, 422 duplicate email, 400 field errors (this is the `@Valid` branch deferred all the way back when `GlobalExceptionHandler` was first built)
+  - login: 200 + token/tokenType/expiresIn, 401 wrong password, 401 unknown email
+  - protected endpoint without token → 401 (`RestAuthenticationEntryPoint`), malformed token → 401, **expired token → 401** (generates a token with a negative-expiration `JwtTokenProvider` instance — this case was initially missed and added after being asked for explicitly)
+  - `/me` GET/PUT/DELETE happy paths, and soft-delete → subsequent login now fails (exercises the `DisabledException` fix above)
+- [x] **Found and fixed two more pre-existing scaffolding bugs while running the full suite for the first time ever in this project** (none of the targeted `-Dtest=X` runs so far had exercised these):
+  1. `application-test.yml`'s `tripsi.jwt.secret` (`test-secret-key-that-is-at-least-256-bits-long-for-hmac-sha`) contained hyphens — **not valid Base64** — which crashed `JwtTokenProvider`'s bean creation (`DecodingException: Illegal base64 character: '-'`) the moment any test loaded the full Spring context. Replaced with a real generated Base64 string (fixed, test-only — not a real credential, fine to commit)
+  2. `TripSiApplicationTests` (context-load smoke test, present since Day 1, never actually run before) had no Testcontainers setup, so after removing the legacy `jdbc:tc:` URL it had no datasource at all. Added the same `@Testcontainers` + `@ServiceConnection PostgreSQLContainer` pattern used everywhere else
+- [x] **Known issue, left for Sprint 2 (not blocking Sprint 1)**: `ModularityTests` (`ApplicationModules.of(...)` / `.verify()`) fails with `NoSuchMethodError` on `ConfigDataEnvironmentPostProcessor.applyTo(...)` — a binary incompatibility between `spring-modulith` 2.1.1 and `spring-boot` 3.5.16. No stable Modulith release fixes this yet (only pre-release `2.2.0-M2`). Formal module-boundary verification is SPRINT_PLAN task #32 (Sprint 2), so this doesn't block Sprint 1 — revisit then
+- [x] **Full suite result**: 61/61 tests passing (`mvn test -Dtest='!ModularityTests'`), `BUILD SUCCESS`
+
 ---
 
 ## What Needs To Be Done Next
 
 > Order below follows `docs/SPRINT_PLAN.md` task numbering exactly (not reshuffled) per explicit instruction.
 
-### Sprint 1 — remaining tasks (branch: `feature/project-setup` until Sprint 1 ends)
-- [ ] **#17** Controller tests (MockMvc) for `AuthController` + `UserController` — also covers the `@Valid` validation branch deferred earlier. This is the LAST Sprint 1 task
+### Sprint 1 — COMPLETE ✅ (all 17 tasks done, 61/61 tests passing, one known issue tracked for Sprint 2 — see above)
 
 ### Sprint 2 (Oct 20–26): Suggestion + Spring AI
 ### Sprint 3 (Oct 27–Nov 2): Flight + Duffel API

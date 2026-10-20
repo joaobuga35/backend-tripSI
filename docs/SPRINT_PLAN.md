@@ -196,7 +196,7 @@
 
 | Sprint | Planned SP | Completed SP | Notes |
 |--------|:---:|:---:|-------|
-| Sprint 1 | 32 | 32 | Tasks #1–16 done. Fixed a pre-existing scaffolding bug: application-test.yml's jdbc:tc: driver had no matching pom.xml dependency; switched to @ServiceConnection (current Spring Boot standard). Last remaining task: #17 (MockMvc controller tests) on `feature/project-setup` — closes out Sprint 1 |
+| Sprint 1 | **32** | **32 — COMPLETE** | All 17 tasks done. Found/fixed 3 pre-existing scaffolding bugs while running the full suite for the first time: invalid Base64 JWT test secret, TripSiApplicationTests missing Testcontainers setup, GlobalExceptionHandler not catching the full AuthenticationException family. Found/fixed 1 real app bug: disabled-user login fell through to 500 instead of 401. 61/61 tests passing; 1 known issue tracked for Sprint 2 (ModularityTests vs spring-modulith/boot version mismatch) |
 | Sprint 2 | 26 | — | |
 | Sprint 3 | 36 | — | |
 | Sprint 4 | 42 | — | |

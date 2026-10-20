@@ -40,7 +40,8 @@ public class UserController {
     @Operation(summary = "Update the authenticated user's profile")
     @ApiResponse(responseCode = "200", description = "User updated")
     @PutMapping("/me")
-    public UserResponseDTO updateCurrentUser(@AuthenticationPrincipal JwtPrincipal principal, @Valid @RequestBody UpdateUserDTO request) {
+    public UserResponseDTO updateCurrentUser(@AuthenticationPrincipal JwtPrincipal principal,
+            @Valid @RequestBody UpdateUserDTO request) {
         return userServicePort.update(principal.userId(), request);
     }
 
