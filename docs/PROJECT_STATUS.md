@@ -68,6 +68,11 @@
 - [x] `AuthServicePort` (`user/port/in/`) + `AuthService` (`user/application/`) — TDD (2/2 tests). Deliberately separate from `UserServicePort`: login is an authentication concern (`AuthenticationManager` + JWT issuance), not user CRUD, and isn't in the original `CLASS_DIAGRAM.md` port list
 - [x] `AuthController` (`user/adapter/in/rest/`) — thin, delegates `register` to `UserServicePort` and `login` to `AuthServicePort`; Springdoc `@Operation`/`@ApiResponse` annotations present. `POST /api/v1/auth/register` (201), `POST /api/v1/auth/login` (200, 401 on bad credentials via existing `GlobalExceptionHandler`)
 
+### UserController (SPRINT_PLAN #15, branch `feature/project-setup`)
+- [x] `JwtPrincipal(UUID userId, String email)` record (`shared/security/`) — replaces the raw email string as the `Authentication` principal set by `JwtAuthenticationFilter`, so controllers get the user's ID without an extra DB lookup. Still framework-generic, no `user` module dependency
+- [x] `@EnableMethodSecurity` added to `SecurityConfig` to support `@PreAuthorize`
+- [x] `UserController` (`user/adapter/in/rest/`) — **changed from the originally sketched `/api/v1/users/me` to `GET/PUT/DELETE /api/v1/users/{id}`** (real UUID in the path — explicit developer decision, REST-by-resource-id rather than an implicit "me" pseudo-id). Ownership enforced declaratively with `@PreAuthorize("#id == authentication.principal.userId()")`; mismatched id → 403 via the existing `RestAccessDeniedHandler`. No admin-bypass yet (no admin endpoints are in scope this sprint — would be speculative to add now)
+
 ---
 
 ## What Needs To Be Done Next
@@ -75,9 +80,8 @@
 > Order below follows `docs/SPRINT_PLAN.md` task numbering exactly (not reshuffled) per explicit instruction.
 
 ### Sprint 1 — remaining tasks (branch: `feature/project-setup` until Sprint 1 ends)
-- [ ] **#15** `UserController` — GET/PUT `/api/v1/users/me`
 - [ ] **#16** `UserRepository` integration tests (Testcontainers)
-- [ ] **#17** Auth controller tests (MockMvc) — also covers the `@Valid` validation branch deferred above
+- [ ] **#17** Controller tests (MockMvc) for `AuthController` + `UserController` — also covers the `@Valid` validation branch deferred earlier
 
 ### Sprint 2 (Oct 20–26): Suggestion + Spring AI
 ### Sprint 3 (Oct 27–Nov 2): Flight + Duffel API

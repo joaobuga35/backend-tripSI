@@ -31,7 +31,9 @@ class JwtAuthenticationFilterTest {
 
     @Test
     void should_authenticate_when_bearer_token_is_valid() throws ServletException, IOException {
+        UUID userId = UUID.randomUUID();
         when(jwtTokenProvider.isValid("valid-token")).thenReturn(true);
+        when(jwtTokenProvider.getUserId("valid-token")).thenReturn(userId);
         when(jwtTokenProvider.getEmail("valid-token")).thenReturn("jane@tripsi.com");
         when(jwtTokenProvider.getRoles("valid-token")).thenReturn(Set.of("ROLE_USER"));
 
@@ -44,7 +46,7 @@ class JwtAuthenticationFilterTest {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         assertThat(authentication).isNotNull();
-        assertThat(authentication.getPrincipal()).isEqualTo("jane@tripsi.com");
+        assertThat(authentication.getPrincipal()).isEqualTo(new JwtPrincipal(userId, "jane@tripsi.com"));
         assertThat(authentication.getAuthorities())
                 .extracting(Object::toString)
                 .containsExactly("ROLE_USER");

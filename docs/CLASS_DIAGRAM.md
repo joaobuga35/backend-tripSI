@@ -415,6 +415,8 @@ classDiagram
 
 **Note (login)**: this diagram's original `UserServicePort` has no login method — only CRUD. Login (authenticate via `AuthenticationManager` + issue a JWT) is a distinct `AuthServicePort` / `AuthService`, added during implementation. `AuthController` depends on both ports: `register` → `UserServicePort`, `login` → `AuthServicePort`.
 
+**Note (UserController paths)**: implemented as `GET/PUT/DELETE /api/v1/users/{id}` (real UUID in the path, REST-by-ID), not `/api/v1/users/me` as originally sketched. Ownership is enforced with `@PreAuthorize("#id == authentication.principal.userId()")`. This requires the authenticated principal to carry the user's ID, so `JwtAuthenticationFilter` (shared/security) sets a generic `JwtPrincipal(UUID userId, String email)` as the `Authentication` principal instead of the raw email string — still no dependency on the `user` module from `shared`.
+
 ### suggestion module
 ```
 ┌─ Primary Port (in) ──────────────────────┐

@@ -196,7 +196,7 @@
 
 | Sprint | Planned SP | Completed SP | Notes |
 |--------|:---:|:---:|-------|
-| Sprint 1 | 32 | 29 | Tasks #1–14 done. New port not in original CLASS_DIAGRAM.md: AuthServicePort/AuthService (login is an auth concern, kept separate from UserServicePort's CRUD). Next: #15 (UserController) on `feature/project-setup` |
+| Sprint 1 | 32 | 30 | Tasks #1–15 done. UserController uses /api/v1/users/{id} (not /me, developer decision) with @PreAuthorize ownership check; JwtAuthenticationFilter principal changed to JwtPrincipal(userId, email) to support it. Next: #16 (UserRepository Testcontainers) on `feature/project-setup` |
 | Sprint 2 | 26 | — | |
 | Sprint 3 | 36 | — | |
 | Sprint 4 | 42 | — | |
