@@ -70,8 +70,7 @@
 
 ### UserController (SPRINT_PLAN #15, branch `feature/project-setup`)
 - [x] `JwtPrincipal(UUID userId, String email)` record (`shared/security/`) — replaces the raw email string as the `Authentication` principal set by `JwtAuthenticationFilter`, so controllers get the user's ID without an extra DB lookup. Still framework-generic, no `user` module dependency
-- [x] `@EnableMethodSecurity` added to `SecurityConfig` to support `@PreAuthorize`
-- [x] `UserController` (`user/adapter/in/rest/`) — **changed from the originally sketched `/api/v1/users/me` to `GET/PUT/DELETE /api/v1/users/{id}`** (real UUID in the path — explicit developer decision, REST-by-resource-id rather than an implicit "me" pseudo-id). Ownership enforced declaratively with `@PreAuthorize("#id == authentication.principal.userId()")`; mismatched id → 403 via the existing `RestAccessDeniedHandler`. No admin-bypass yet (no admin endpoints are in scope this sprint — would be speculative to add now)
+- [x] `UserController` (`user/adapter/in/rest/`) — `GET/PUT/DELETE /api/v1/users/me`, as originally sketched. Briefly switched to `/api/v1/users/{id}` + `@PreAuthorize` ownership check, then reverted: putting the id in the URL at all is an unneeded IDOR attack surface (OWASP A01) for no benefit, since the server already knows who's calling from the token — `/me` has no id for an attacker to tamper with. `@EnableMethodSecurity`/`@PreAuthorize` removed from `SecurityConfig` accordingly (unused). The `JwtPrincipal(UUID userId, String email)` change (see #13 above) was kept — it's what lets `/me` read the id straight off the token with no extra DB lookup
 
 ---
 

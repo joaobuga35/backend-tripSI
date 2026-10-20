@@ -196,7 +196,7 @@
 
 | Sprint | Planned SP | Completed SP | Notes |
 |--------|:---:|:---:|-------|
-| Sprint 1 | 32 | 30 | Tasks #1–15 done. UserController uses /api/v1/users/{id} (not /me, developer decision) with @PreAuthorize ownership check; JwtAuthenticationFilter principal changed to JwtPrincipal(userId, email) to support it. Next: #16 (UserRepository Testcontainers) on `feature/project-setup` |
+| Sprint 1 | 32 | 30 | Tasks #1–15 done. UserController settled on /api/v1/users/me (tried /{id}+@PreAuthorize first, reverted — unnecessary IDOR surface for no gain, OWASP A01). Kept JwtPrincipal(userId, email) as the JWT filter's principal — avoids an extra DB lookup either way. Next: #16 (UserRepository Testcontainers) on `feature/project-setup` |
 | Sprint 2 | 26 | — | |
 | Sprint 3 | 36 | — | |
 | Sprint 4 | 42 | — | |
