@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -39,10 +39,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return buildProblemDetail(HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage());
     }
 
-    // Returns 401 on bad credentials; logged as a security event per CLAUDE.md.
-    @ExceptionHandler(BadCredentialsException.class)
-    public ProblemDetail handleBadCredentials(BadCredentialsException ex) {
-        log.info("Authentication failed: invalid credentials");
+    // Returns 401 on any authentication failure (bad password, disabled/locked account, etc).
+    // Always the same generic detail, regardless of cause — revealing "account disabled" vs
+    // "wrong password" would let an attacker enumerate which emails have an account.
+    @ExceptionHandler(AuthenticationException.class)
+    public ProblemDetail handleAuthenticationFailure(AuthenticationException ex) {
+        log.info("Authentication failed: {}", ex.getClass().getSimpleName());
         return buildProblemDetail(HttpStatus.UNAUTHORIZED, "Invalid credentials");
     }
 

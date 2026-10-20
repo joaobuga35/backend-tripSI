@@ -4,11 +4,8 @@
 # ╚══════════════════════════════════════════════╝
 
 spring:
-  datasource:
-    # Testcontainers provides the connection URL dynamically
-    url: jdbc:tc:postgresql:16:///tripsi_test
-    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
-
+  # Datasource is auto-configured by @ServiceConnection on the Testcontainers PostgreSQL
+  # container declared in each test class — no manual url/driver here.
   jpa:
     show-sql: false
 
@@ -32,8 +29,8 @@ springdoc:
   swagger-ui:
     enabled: false
 
-# ── Test JWT ──
+# ── Test JWT ── (fixed test-only secret, not a real credential — fine to commit)
 tripsi:
   jwt:
-    secret: test-secret-key-that-is-at-least-256-bits-long-for-hmac-sha
+    secret: S8mjVhuEyCt29RLXaRCGkHRf+7zVHiMoaRtafoVbTDfc/cWuAbpAvkVPZnWqsJ/XZU28R/j6VokxXxgpsQxOcw==
     expiration-ms: 3600000

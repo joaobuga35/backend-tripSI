@@ -24,7 +24,16 @@ classDiagram
             +createNew(UserDTO) User
             +updateUser(UpdateUserDTO) void
             +softDelete() void
+            +getRoles() Set~Role~
+        }
+
+        class UserPrincipal {
+            <<adapter — adapter/in/security>>
+            -User user
             +getAuthorities() Collection
+            +getUsername() String
+            +getPassword() String
+            +isEnabled() boolean
         }
 
         class UserServicePort {
@@ -270,6 +279,7 @@ classDiagram
     User --> Role : has many
     User --> Status : has one
     UserServicePort <|.. User : operates on
+    UserPrincipal --> User : wraps (adapts to UserDetails)
 
     %% Suggestion module (internal JPA relationships)
     Prompt *-- Location : embeds
@@ -385,6 +395,14 @@ classDiagram
 │  - GET  /api/v1/users/me                 │
 │  - PUT  /api/v1/users/me                 │
 │  - DELETE /api/v1/users/me               │
+│                                           │
+│  UserDetailsServiceImpl (Spring Security)│
+│  - loadUserByUsername(String)            │
+│    → wraps User into UserPrincipal       │
+│    (adapter/in/security/) — invoked BY   │
+│    the Spring Security framework, same   │
+│    role as a controller: external        │
+│    stimulus calling into the module      │
 └───────────────────────────────────────────┘
 
 ┌─ Secondary Ports (out) ──────────────────┐
@@ -392,6 +410,12 @@ classDiagram
 │    extends JpaRepository<User, UUID>     │
 └───────────────────────────────────────────┘
 ```
+
+**Note**: `User` (domain) has no dependency on Spring Security — it exposes `getRoles(): Set<Role>` only. `UserPrincipal` (in `adapter/in/security/`) implements `UserDetails` and translates `Set<Role>` → `Collection<GrantedAuthority>`. This keeps the domain testable without the Spring Security classpath and keeps the auth strategy swappable without touching the domain (ADR-002).
+
+**Note (login)**: this diagram's original `UserServicePort` has no login method — only CRUD. Login (authenticate via `AuthenticationManager` + issue a JWT) is a distinct `AuthServicePort` / `AuthService`, added during implementation. `AuthController` depends on both ports: `register` → `UserServicePort`, `login` → `AuthServicePort`.
+
+**Note (UserController paths)**: implemented as `GET/PUT/DELETE /api/v1/users/me` (as originally sketched). Briefly tried `/api/v1/users/{id}` (real UUID in path) with ownership checked via `@PreAuthorize`, but reverted: exposing the id in the URL at all is an unnecessary IDOR attack surface (OWASP A01 / Broken Access Control) for zero benefit here, since the server already knows the caller's identity from the token. `/me` removes that surface entirely — there is no id for an attacker to tamper with in the request. The underlying mechanism from that attempt was kept because it's strictly better: `JwtAuthenticationFilter` (shared/security) sets a generic `JwtPrincipal(UUID userId, String email)` as the `Authentication` principal (instead of the raw email string), so `UserController` reads `principal.userId()` directly with no extra DB lookup to resolve id from email.
 
 ### suggestion module
 ```
