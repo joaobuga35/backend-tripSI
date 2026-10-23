@@ -1,13 +1,17 @@
 # TripSi — Project Status
 
-> **Last updated**: 2026-10-20 (Sprint 1 — COMPLETE, on `feature/project-setup`, not yet merged to `dev`)
+> **Last updated**: 2026-10-23 (Sprint 1 — COMPLETE, zero known issues, on `feature/project-setup`, not yet merged to `dev`)
 > **Current Sprint**: Sprint 1 (Oct 13–19) — Foundation + User + Auth
 
 ---
 
-## Known Issues
+## Resolved Issues
 
-- **`ModularityTests` fails** — `NoSuchMethodError` on `ConfigDataEnvironmentPostProcessor.applyTo(...)`. Binary incompatibility between `spring-modulith` 2.1.1 and `spring-boot` 3.5.16; no stable Modulith release fixes it yet (only pre-release `2.2.0-M2`). Not a Sprint 1 blocker (formal module-boundary verification is SPRINT_PLAN #32, Sprint 2) — revisit then, check for a newer stable Modulith release first.
+- **`ModularityTests` — FIXED.** Root cause was never really "2.1.1 is broken" — the entire `spring-modulith` **2.x line targets Spring Boot 4.x** (same generation-pairing convention as Spring Security 6.x/Boot 3.x vs Security 7.x/Boot 4.x). `2.x`'s `ApplicationModuleDetectionStrategyLookup` calls `ConfigurableBootstrapContext` from package `org.springframework.boot.bootstrap` — a package that only exists in Boot 4.x; Boot 3.5.16 still has that class in `org.springframework.boot` (no `.bootstrap`), hence `NoSuchMethodError`. Downgrading to `2.0.9` reproduced the identical error (confirming it's a generation mismatch, not a patch-level bug) — the correct fix was the **1.x line**, whose latest stable is `1.4.14`. Switching to `1.4.14` surfaced two more real, previously-hidden issues, both fixed:
+  1. **Named interface violation**: once `shared.security` and `shared.exception` are explicitly marked with `@NamedInterface` (needed for `JwtPrincipal`/`JwtTokenProvider`/`ResourceNotFoundException`/`BusinessRuleException` to be visible outside `shared`), the bare `"shared"` entry in `user`'s `allowedDependencies` stopped covering named interfaces. Fixed by listing them explicitly: `allowedDependencies = {"shared", "shared :: security", "shared :: exception"}` in `user/package-info.java`.
+  2. **Missing `event_publication` table**: `spring-modulith-starter-jpa` (present since Day 1 scaffolding, for ADR-005) registers its own JPA entity for tracking published domain events — Hibernate's `validate` mode failed because no Flyway migration created it. Added `V3__create_event_publication_table.sql` using Spring Modulith's official PostgreSQL reference schema (legacy variant — matches the columns present in 1.4.14's `JpaEventPublication`: `id, listener_id, event_type, serialized_event, publication_date, completion_date`).
+  - Also fixed a **flaky test** found while re-running the suite repeatedly: `JwtTokenProviderTest.should_return_false_when_token_is_tampered` flipped the *last* character of the token, which sometimes lands on an unused padding bit in base64url and silently fails to change the decoded bytes. Now flips a character in the middle of the token instead (deterministic across 15+ consecutive runs).
+- **Full suite: 63/63 tests passing, `mvn test` → `BUILD SUCCESS`.**
 
 ---
 

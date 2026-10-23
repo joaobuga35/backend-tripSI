@@ -43,7 +43,12 @@ class JwtTokenProviderTest {
     @Test
     void should_return_false_when_token_is_tampered() {
         String token = jwtTokenProvider.generateToken(UUID.randomUUID(), "jane@tripsi.com", Set.of("ROLE_USER"));
-        String tampered = token.substring(0, token.length() - 1) + (token.endsWith("a") ? "b" : "a");
+        // Flip a character in the middle of the signature segment, not the last character of the
+        // whole token: base64url's final character can carry unused padding bits, so flipping it
+        // sometimes decodes to the exact same bytes and leaves the signature valid (flaky test).
+        int flipIndex = token.length() / 2;
+        char flippedChar = token.charAt(flipIndex) == 'a' ? 'b' : 'a';
+        String tampered = token.substring(0, flipIndex) + flippedChar + token.substring(flipIndex + 1);
 
         assertThat(jwtTokenProvider.isValid(tampered)).isFalse();
     }

@@ -196,7 +196,7 @@
 
 | Sprint | Planned SP | Completed SP | Notes |
 |--------|:---:|:---:|-------|
-| Sprint 1 | **32** | **32 — COMPLETE** | All 17 tasks done. Found/fixed 3 pre-existing scaffolding bugs while running the full suite for the first time: invalid Base64 JWT test secret, TripSiApplicationTests missing Testcontainers setup, GlobalExceptionHandler not catching the full AuthenticationException family. Found/fixed 1 real app bug: disabled-user login fell through to 500 instead of 401. 61/61 tests passing; 1 known issue tracked for Sprint 2 (ModularityTests vs spring-modulith/boot version mismatch) |
+| Sprint 1 | **32** | **32 — COMPLETE** | All 17 tasks done. Found/fixed 3 pre-existing scaffolding bugs: invalid Base64 JWT test secret, TripSiApplicationTests missing Testcontainers setup, GlobalExceptionHandler not catching the full AuthenticationException family. Found/fixed 1 real app bug: disabled-user login fell through to 500 instead of 401. Also fixed the ModularityTests/spring-modulith issue — it was targeting Boot 4.x (2.x line); switched to the Boot-3.x-compatible 1.4.14, added required @NamedInterface declarations + the event_publication Flyway migration. 63/63 tests passing, mvn test → BUILD SUCCESS, zero known issues |
 | Sprint 2 | 26 | — | |
 | Sprint 3 | 36 | — | |
 | Sprint 4 | 42 | — | |

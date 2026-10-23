@@ -5,6 +5,6 @@
  * <p>Publishes: no domain events (other modules don't depend on user lifecycle)</p>
  */
 @org.springframework.modulith.ApplicationModule(
-        allowedDependencies = "shared"
+        allowedDependencies = {"shared", "shared :: security", "shared :: exception"}
 )
 package com.tripsi.api.user;
